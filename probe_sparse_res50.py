@@ -66,6 +66,7 @@ def save_capstan_format(
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+print("Probing using device {}".format(device))
 
 transform_test = transforms.Compose(
     [
@@ -115,7 +116,7 @@ def _get_sparsity(m):
 
 def _instrument(*args, **kwargs):
     global ctr
-    print("instrumented! len(args) = {}".format(len(args)))
+    # print("instrumented! len(args) = {}".format(len(args)))
     if len(args) != 2:
         raise ValueError("Not sure what to do with args != 2...")
     begin = time.time()
@@ -126,7 +127,7 @@ def _instrument(*args, **kwargs):
         prefix = "conv_{}".format(ctr)
         ctr += 1
         print(_get_sparsity(args[0].weight))
-        save_capstan_format(data_dir, prefix, args[1], args[0].weight, _r)
+        # save_capstan_format(data_dir, prefix, args[1], args[0].weight, _r)
 
     return _r
 
@@ -134,7 +135,8 @@ def _instrument(*args, **kwargs):
 nn.Module.__call__ = _instrument
 
 model.load_state_dict(model_state_dict)
-if device == "gpu":
+if device == "cuda":
+    print("running cuda!")
     model = model.to("cuda")
     model = torch.nn.DataParallel(model)
     cudnn.benchmark = True
@@ -142,7 +144,7 @@ else:
     torch.set_num_threads(128)
 out = model(test_img)
 print(torch.argmax(out, dim=0))
-f_name = "./{}.csv".format("gpu" if device == "gpu" else "cpu")
+f_name = "./{}.csv".format("cuda" if device == "cuda" else "cpu")
 with open(f_name, "w+") as f:
     lines = [
         "{}, {}\n".format(t[0], "{:.2f}".format(t[1]))
