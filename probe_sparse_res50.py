@@ -5,7 +5,7 @@ import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import time
 import numpy as np
-from models import ResNet50
+from models import resnet, resnet50
 from functools import reduce
 from pathlib import Path
 
@@ -37,6 +37,8 @@ def save_capstan_format(
     isl_img, dim, _ = in_cap.shape
     assert isl_img == isl, "in_cap and kern's isl don't match!"
     ver_str = "d{}_k{}_i{}_o{}_s{}".format(dim, kdim, isl, osl, str(sparsity)[2:4])
+    print(ver_str)
+    return
     d = data_dir + "/" + "{}_{}".format(ver_str, prefix) + "/"
     try:
         Path(d).mkdir(parents=True, exist_ok=True)
@@ -104,7 +106,7 @@ for name, module in state_dict.items():
         m = module
         k = ".".join(fields[1:])
     model_state_dict[k] = m
-model = ResNet50()
+model = resnet50()
 
 conv_runtime_dict = {}
 orig_pointer = nn.Module.__call__
@@ -126,7 +128,7 @@ def _instrument(*args, **kwargs):
         conv_runtime_dict[ctr] = (end - begin) * 1000
         prefix = "conv_{}".format(ctr)
         ctr += 1
-        print(_get_sparsity(args[0].weight))
+        # print(_get_sparsity(args[0].weight))
         # save_capstan_format(data_dir, prefix, args[1], args[0].weight, _r)
 
     return _r

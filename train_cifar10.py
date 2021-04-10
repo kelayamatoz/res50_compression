@@ -56,16 +56,7 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 # Model
 print('==> Building model..')
 # net = VGG('VGG19')
-if args.net=='res18':
-    net = ResNet18()
-elif args.net=='vgg':
-    net = VGG('VGG19')
-elif args.net=='res34':
-    net = ResNet34()
-elif args.net=='res50':
-    net = ResNet50()
-elif args.net=='res101':
-    net = ResNet101()
+net = resnet50()
 # net = PreActResNet18()
 # net = GoogLeNet()
 # net = DenseNet121()

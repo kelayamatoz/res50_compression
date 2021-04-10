@@ -63,13 +63,7 @@ testloader = torch.utils.data.DataLoader(
 
 # Model
 print('==> Building model..')
-if args.net == 'res18':
-    net = ResNet18()
-elif args.net == 'vgg':
-    net = VGG('VGG19')
-elif args.net == 'res50':
-    net = ResNet50()
-
+net = resnet50()
 net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
