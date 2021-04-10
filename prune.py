@@ -25,10 +25,10 @@ import numpy as np
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Pruning')
 parser.add_argument('--loadfile', '-l',
                     default="checkpoint/res18.t7", dest='loadfile')
-parser.add_argument('--prune', '-p', default=0.5,
+parser.add_argument('--prune', '-p', default=0.7,
                     dest='prune', help='Parameters to be pruned')
 parser.add_argument('--lr', default=0.01, type=float, help='learning rate')
-parser.add_argument('--net', default='res18')
+parser.add_argument('--net', default='res50')
 args = parser.parse_args()
 
 prune = float(args.prune)
@@ -44,20 +44,22 @@ transform_train = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    transforms.Resize((224, 224))
 ])
 transform_test = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    transforms.Resize((224, 224))
 ])
 trainset = torchvision.datasets.CIFAR10(
     root='./data', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(
-    trainset, batch_size=128, shuffle=True, num_workers=2)
+    trainset, batch_size=8, shuffle=True, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(
     root='./data', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(
-    testset, batch_size=100, shuffle=False, num_workers=2)
+    testset, batch_size=8, shuffle=False, num_workers=2)
 
 # Model
 print('==> Building model..')
@@ -158,7 +160,8 @@ def test(epoch):
         best_acc = acc
 
 
-for epoch in range(start_epoch, start_epoch+20):
+# for epoch in range(start_epoch, start_epoch+20):
+for epoch in range(start_epoch, start_epoch+1):
     train(epoch)
     test(epoch)
     with open("prune-results-"+str(prune)+'-'+str(args.net)+".txt", "a") as f:

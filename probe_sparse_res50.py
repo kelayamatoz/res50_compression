@@ -13,7 +13,8 @@ THRESH = 0.01
 DEBUG = True
 S2MS = 1000
 ctr = 0
-data_dir = '../data/sparse_res_conv'
+# data_dir = '../data/sparse_res_conv'
+data_dir = 'sparse_res_conv'
 
 def _get_sparsity(t: torch.Tensor) -> float:
     return t.to_sparse()._nnz() / reduce(lambda x, y: x * y, list(t.shape))
@@ -70,6 +71,7 @@ transform_test = transforms.Compose(
     [
         transforms.ToTensor(),
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        transforms.Resize((224, 224))
     ]
 )
 
@@ -124,7 +126,7 @@ def _instrument(*args, **kwargs):
         prefix = "conv_{}".format(ctr)
         ctr += 1
         print(_get_sparsity(args[0].weight))
-        # save_capstan_format(data_dir, prefix, args[1], args[0].weight, _r)
+        save_capstan_format(data_dir, prefix, args[1], args[0].weight, _r)
 
     return _r
 
