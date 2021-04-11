@@ -8,6 +8,12 @@ import numpy as np
 from models import resnet, resnet50
 from functools import reduce
 from pathlib import Path
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--iter', type=int)
+args = parser.parse_args()
+iteration = args.iter
 
 THRESH = 0.01
 DEBUG = True
@@ -146,7 +152,7 @@ else:
     torch.set_num_threads(128)
 out = model(test_img)
 print(torch.argmax(out, dim=0))
-f_name = "./{}.csv".format("cuda" if device == "cuda" else "cpu")
+f_name = "./{}_{}.csv".format("cuda" if device == "cuda" else "cpu", iteration)
 with open(f_name, "w+") as f:
     lines = [
         "{}, {}\n".format(t[0], "{:.2f}".format(t[1]))
